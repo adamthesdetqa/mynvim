@@ -35,6 +35,9 @@ vim.keymap.set("v", "k", "j", { noremap = true }) -- k moves down
 vim.keymap.set("v", "l", "k", { noremap = true }) -- l moves up
 vim.keymap.set("v", ";", "l", { noremap = true }) -- ; moves right
 
+-- Delete lines above and below mappings
+vim.keymap.set("n","dk","dj", {noremap=true}) -- delete line and line below
+vim.keymap.set("n","dl","dk", {noremap=true}) -- delete line and line above
 -- Example mapping for basic window navigation (Normal mode)
 vim.keymap.set('n', '<C-j>', '<C-w>h', { desc = 'Go to left window' })
 vim.keymap.set('n', '<C-k>', '<C-w>j', { desc = 'Go to down window' })
