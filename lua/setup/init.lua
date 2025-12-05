@@ -68,5 +68,6 @@ vim.keymap.set("n", "K", function()
 		vim.lsp.buf.hover()
 	end
 end, { noremap = true, silent = true })
+vim.keymap.set("n", "<C-z>", "zt", { noremap = true, silent = true, desc = "Move current line to top" })
 
 
