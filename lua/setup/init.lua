@@ -1,6 +1,18 @@
 vim.g.mapleader = " " -- set leader key before Lazy
 vim.g.maplocalleader = " " -- set leader key before Lazy
+-- copilot
+vim.g.copilot_no_tab_map = true
+vim.keymap.set('i', '<C-y>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false,
+  silent = true
+})
 
+vim.keymap.set('i', '<C-;>', 'copilot#AcceptWord()', {
+  expr = true,
+  replace_keycodes = false,
+  silent = true
+})
 -- vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
 -- vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
 -- vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
