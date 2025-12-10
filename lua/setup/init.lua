@@ -1,42 +1,18 @@
-vim.g.mapleader = " " -- set leader key before Lazy
-vim.g.maplocalleader = " " -- set leader key before Lazy
--- copilot
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 vim.g.copilot_no_tab_map = true
+
 vim.keymap.set("i", "<C-y>", 'copilot#Accept("\\<CR>")', {
-	expr = true,
-	replace_keycodes = false,
-	silent = true,
+    expr = true,
+    replace_keycodes = false,
+    silent = true,
 })
-vim.keymap.set(
-	"n",
-	"<leader>cc",
-	":CopilotChatToggle<CR>",
-	{ noremap = true, silent = true, desc = "Toggle Copilot Chat" }
-)
-vim.keymap.set(
-	"n",
-	"<leader>ce",
-	":CopilotChatExplain<CR>",
-	{ desc = "CopilotChat: Explain", noremap = true, silent = true }
-)
-vim.keymap.set("v", "<leader>cd", "<cmd>CopilotChatDocs<CR>", { desc = "CopilotChat Docs" })
-vim.keymap.set("v", "<leader>cf", "<cmd>CopilotChatFix<CR>", { desc = "CopilotChat Fix" })
-vim.keymap.set(
-	"v",
-	"<leader>ce",
-	":CopilotChatExplain<CR>",
-	{ desc = "CopilotChat: Explain", noremap = true, silent = true }
-)
 
 vim.keymap.set("i", "<C-;>", "copilot#AcceptWord()", {
-	expr = true,
-	replace_keycodes = false,
-	silent = true,
+    expr = true,
+    replace_keycodes = false,
+    silent = true,
 })
--- vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
--- vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
--- vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
--- vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
 vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" }) -- Smaller dot
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
