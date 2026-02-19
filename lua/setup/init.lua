@@ -1,10 +1,18 @@
-vim.g.mapleader = " " -- set leader key before Lazy
-vim.g.maplocalleader = " " -- set leader key before Lazy
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.g.copilot_no_tab_map = true
 
--- vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" })
--- vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
--- vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
--- vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
+vim.keymap.set("i", "<C-y>", 'copilot#Accept("\\<CR>")', {
+    expr = true,
+    replace_keycodes = false,
+    silent = true,
+})
+
+vim.keymap.set("i", "<C-;>", "copilot#AcceptWord()", {
+    expr = true,
+    replace_keycodes = false,
+    silent = true,
+})
 
 vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" }) -- Smaller dot
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
@@ -36,13 +44,13 @@ vim.keymap.set("v", "l", "k", { noremap = true }) -- l moves up
 vim.keymap.set("v", ";", "l", { noremap = true }) -- ; moves right
 
 -- Delete lines above and below mappings
-vim.keymap.set("n","dk","dj", {noremap=true}) -- delete line and line below
-vim.keymap.set("n","dl","dk", {noremap=true}) -- delete line and line above
+vim.keymap.set("n", "dk", "dj", { noremap = true }) -- delete line and line below
+vim.keymap.set("n", "dl", "dk", { noremap = true }) -- delete line and line above
 -- Example mapping for basic window navigation (Normal mode)
-vim.keymap.set('n', '<C-j>', '<C-w>h', { desc = 'Go to left window' })
-vim.keymap.set('n', '<C-k>', '<C-w>j', { desc = 'Go to down window' })
-vim.keymap.set('n', '<C-l>', '<C-w>k', { desc = 'Go to up window' })
-vim.keymap.set('n', '<C-;>', '<C-w>l', { desc = 'Go to right window' })
+vim.keymap.set("n", "<C-j>", "<C-w>h", { desc = "Go to left window" })
+vim.keymap.set("n", "<C-k>", "<C-w>j", { desc = "Go to down window" })
+vim.keymap.set("n", "<C-l>", "<C-w>k", { desc = "Go to up window" })
+vim.keymap.set("n", "<C-;>", "<C-w>l", { desc = "Go to right window" })
 vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",
 	group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
@@ -69,5 +77,3 @@ vim.keymap.set("n", "K", function()
 	end
 end, { noremap = true, silent = true })
 vim.keymap.set("n", "<C-z>", "zt", { noremap = true, silent = true, desc = "Move current line to top" })
-
-
