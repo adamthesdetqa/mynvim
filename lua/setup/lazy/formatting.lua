@@ -20,6 +20,7 @@ return {
 				graphql = { "prettier" },
 				lua = { "stylua" },
 				go = { "gofmt", "goimports" },
+				python = { "ruff_format", "ruff_organize_imports" },
 			},
 			format_on_save = true,
 			formatters = {

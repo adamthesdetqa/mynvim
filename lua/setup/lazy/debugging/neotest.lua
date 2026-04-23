@@ -5,6 +5,7 @@ return {
 		"nvim-neotest/nvim-nio",
 		"nvim-treesitter/nvim-treesitter",
 		"haydenmeade/neotest-jest", -- Jest adapter for Angular
+		"nvim-neotest/neotest-python", -- Python test adapter
 	},
 	config = function()
 		require("neotest").setup({
@@ -15,6 +16,10 @@ return {
 					cwd = function()
 						return vim.fn.getcwd()
 					end,
+				}),
+				require("neotest-python")({
+					runner = "pytest",
+					python = ".venv/bin/python",
 				}),
 			},
 			-- Use custom command for Karma

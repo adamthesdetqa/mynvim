@@ -62,6 +62,7 @@ require("mason-lspconfig").setup({
 		"svelte",
 		"lua_ls",
 		"emmet_ls",
+		"pyright",
 	},
 	handlers = {
 		-- Custom handler for Angular LSP to enable template completion
@@ -104,10 +105,26 @@ require("mason-tool-installer").setup({
 		"prettier", -- prettier formatter
 		"stylua", -- lua formatter
 		"eslint_d", -- js linter
+		"ruff", -- python linter/formatter
+		"debugpy", -- python debugger
 	},
 })
 
 local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+require("lspconfig").pyright.setup({
+	capabilities = capabilities,
+	settings = {
+		python = {
+			analysis = {
+				typeCheckingMode = "basic",
+				autoSearchPaths = true,
+				useLibraryCodeForTypes = true,
+				diagnosticMode = "openFilesOnly",
+			},
+		},
+	},
+})
 
 require("lspconfig").lua_ls.setup({
 	capabilities = capabilities,
