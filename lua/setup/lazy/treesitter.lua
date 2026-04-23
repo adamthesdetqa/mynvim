@@ -43,6 +43,8 @@ return {
 				"jsdoc",
 				"csv",
 				"go",
+				"python",
+				"toml",
 			},
 			incremental_selection = {
 				enable = true,
