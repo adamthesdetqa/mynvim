@@ -34,8 +34,6 @@ require("lazy").setup({
 	"honza/vim-snippets",
 	"morhetz/gruvbox",
 
-	"saghen/blink.cmp",
-
 	-- Detect tabstop and shiftwidth automatically
 	"tpope/vim-sleuth",
 	{ "L3MON4D3/LuaSnip" },
@@ -68,7 +66,7 @@ require("mason-lspconfig").setup({
 		-- Custom handler for Angular LSP to enable template completion
 		angularls = function()
 			require("lspconfig").angularls.setup({
-				capabilities = require("blink.cmp").get_lsp_capabilities(),
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 				filetypes = { "typescript", "html", "typescript.html", "htmlangular" },
 				root_dir = require("lspconfig.util").root_pattern("angular.json", "package.json", "tsconfig.json"),
 				on_attach = function(client, bufnr)
@@ -107,10 +105,11 @@ require("mason-tool-installer").setup({
 		"eslint_d", -- js linter
 		"ruff", -- python linter/formatter
 		"debugpy", -- python debugger
+		"js-debug-adapter", -- js debugger
 	},
 })
 
-local capabilities = require("blink.cmp").get_lsp_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 require("lspconfig").pyright.setup({
 	capabilities = capabilities,
