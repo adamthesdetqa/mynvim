@@ -28,6 +28,11 @@ keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
 -- keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 -- keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- run current python file
+keymap.set("n", "<leader>rr", function()
+	Snacks.terminal.open("python3 " .. vim.fn.expand("%:p"), { interactive = true })
+end, { desc = "Run current Python file" })
+
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
