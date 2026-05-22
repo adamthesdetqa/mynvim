@@ -6,23 +6,28 @@ return {
 
 		conform.setup({
 			formatters_by_ft = {
-				javascript = { "dprint", "prettier" },
-				typescript = { "dprint" },
-				-- typescript = { "dprint", "prettier" },
+				javascript = { "dprint", "prettier", stop_after_first = true },
+				typescript = { "dprint", "prettier", stop_after_first = true },
 				typescriptreact = { "prettier" },
 				javascriptreact = { "prettier" },
 				svelte = { "prettier" },
-				css = { "prettier", "dprint" },
-				scss = { "prettier", "dprint" },
-				html = { "prettier", "dprint" },
-				json = { "prettier", "dprint" },
-				markdown = { "prettier", "dprint" },
+				css = { "prettier", "dprint", stop_after_first = true },
+				scss = { "prettier", "dprint", stop_after_first = true },
+				html = { "prettier", "dprint", stop_after_first = true },
+				json = { "prettier", "dprint", stop_after_first = true },
+				markdown = { "prettier", "dprint", stop_after_first = true },
 				graphql = { "prettier" },
 				lua = { "stylua" },
 				go = { "gofmt", "goimports" },
 				python = { "ruff_format", "ruff_organize_imports" },
 			},
-			format_on_save = true,
+			format_on_save = function(bufnr)
+				return {
+					lsp_fallback = true,
+					async = false,
+					timeout_ms = 1000,
+				}
+			end,
 			formatters = {
 				injected = { options = { ignore_errors = true } },
 				-- prettier = {

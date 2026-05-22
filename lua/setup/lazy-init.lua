@@ -34,8 +34,6 @@ require("lazy").setup({
 	"honza/vim-snippets",
 	"morhetz/gruvbox",
 
-	"saghen/blink.cmp",
-
 	-- Detect tabstop and shiftwidth automatically
 	"tpope/vim-sleuth",
 	{ "L3MON4D3/LuaSnip" },
@@ -67,10 +65,12 @@ require("mason-lspconfig").setup({
 	handlers = {
 		-- Custom handler for Angular LSP to enable template completion
 		angularls = function()
-			require("lspconfig").angularls.setup({
-				capabilities = require("blink.cmp").get_lsp_capabilities(),
+			vim.lsp.config('angularls', {
+				capabilities = require("cmp_nvim_lsp").default_capabilities(),
 				filetypes = { "typescript", "html", "typescript.html", "htmlangular" },
-				root_dir = require("lspconfig.util").root_pattern("angular.json", "package.json", "tsconfig.json"),
+				root_dir = function(bufnr, on_dir)
+					on_dir(vim.fs.root(bufnr, { "angular.json", "package.json", "tsconfig.json" }))
+				end,
 				on_attach = function(client, bufnr)
 					-- Enable all completion capabilities for Angular templates
 					client.server_capabilities.completionProvider = true
@@ -92,10 +92,11 @@ require("mason-lspconfig").setup({
 					},
 				},
 			})
+			vim.lsp.enable('angularls')
 		end,
 		-- Default handler for other LSPs
 		function(server_name)
-			require("lspconfig")[server_name].setup({})
+			vim.lsp.enable(server_name)
 		end,
 	},
 })
@@ -107,12 +108,13 @@ require("mason-tool-installer").setup({
 		"eslint_d", -- js linter
 		"ruff", -- python linter/formatter
 		"debugpy", -- python debugger
+		"js-debug-adapter", -- js debugger
 	},
 })
 
-local capabilities = require("blink.cmp").get_lsp_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-require("lspconfig").pyright.setup({
+vim.lsp.config('pyright', {
 	capabilities = capabilities,
 	settings = {
 		python = {
@@ -125,8 +127,9 @@ require("lspconfig").pyright.setup({
 		},
 	},
 })
+vim.lsp.enable('pyright')
 
-require("lspconfig").lua_ls.setup({
+vim.lsp.config('lua_ls', {
 	capabilities = capabilities,
 	on_init = function(client)
 		if client.workspace_folders then
@@ -160,3 +163,15 @@ require("lspconfig").lua_ls.setup({
 		Lua = {},
 	},
 })
+vim.lsp.enable('lua_ls')
+
+-- Autosave on CursorHold event
+vim.opt.updatetime = 5000 -- Time in milliseconds (e.g., 5000ms = 5 seconds)
+vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+  group = vim.api.nvim_create_augroup("AutoSave", { clear = true }),
+  callback = function()
+    -- The update command writes the current buffer if it has been modified
+    vim.cmd("silent! update")
+  end,
+})
+

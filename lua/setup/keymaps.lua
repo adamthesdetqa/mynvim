@@ -10,6 +10,15 @@ local keymap = vim.keymap -- for conciseness
 keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 -- use jk to exit insert mode
 keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
+keymap.set("t", "jk", [[<C-\><C-n>]], { desc = "Exit terminal mode with jk" })
+
+-- terminal
+keymap.set({ "n", "t" }, "<C-/>", function()
+	Snacks.terminal.toggle()
+end, { desc = "Toggle Terminal" })
+keymap.set({ "n", "t" }, "<leader>ft", function()
+	Snacks.terminal.toggle()
+end, { desc = "Toggle Terminal" })
 
 -- normal mode vscode like keymaps
 keymap.set("n", "<M-Up>", ":m-2<CR>", { desc = "move line above" })
@@ -18,6 +27,11 @@ keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
 -- Remap for dealing with word wrap
 -- keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 -- keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- run current python file
+keymap.set("n", "<leader>rr", function()
+	Snacks.terminal.open("python3 " .. vim.fn.expand("%:p"), { interactive = true })
+end, { desc = "Run current Python file" })
 
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
