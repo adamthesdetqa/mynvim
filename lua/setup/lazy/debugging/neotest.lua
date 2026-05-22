@@ -5,11 +5,13 @@ return {
 		"nvim-neotest/nvim-nio",
 		"nvim-treesitter/nvim-treesitter",
 		"haydenmeade/neotest-jest", -- Jest adapter for Angular
+		"marilari88/neotest-vitest", -- Vitest adapter
 		"nvim-neotest/neotest-python", -- Python test adapter
 	},
 	config = function()
 		require("neotest").setup({
 			adapters = {
+				require("neotest-vitest"),
 				require("neotest-jest")({
 					jestCommand = "pnpm test", -- Uses Angular CLI
 					env = { CI = true },
