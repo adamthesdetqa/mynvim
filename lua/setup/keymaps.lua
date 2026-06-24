@@ -92,7 +92,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
 
 		opts.desc = "Show LSP implementations"
-		keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client and client.supports_method("textDocument/implementation") then
+			keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+		end
 
 		opts.desc = "Show LSP type definitions"
 		keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions

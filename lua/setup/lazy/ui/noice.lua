@@ -14,7 +14,7 @@ return {
     -- you can enable a preset for easier configuration
     presets = {
       bottom_search = true, -- use a classic bottom cmdline for search
-      command_palette = true, -- position the cmdline and popupmenu together
+      command_palette = false,
       long_message_to_split = true, -- long messages will be sent to a split
       inc_rename = false, -- enables an input dialog for inc-rename.nvim
       lsp_doc_border = false, -- add a border to hover docs and signature help
@@ -22,7 +22,7 @@ return {
     views = {
       cmdline_popup = {
         position = {
-          row = "50%",
+          row = 5,
           col = "50%",
         },
         size = {
@@ -33,7 +33,7 @@ return {
       popupmenu = {
         relative = "editor",
         position = {
-          row = "58%", -- slightly below the cmdline_popup
+          row = 8,
           col = "50%",
         },
         size = {
@@ -49,7 +49,6 @@ return {
         },
       },
     },
-    -- add lualine component config inside lualine config later if we want
   },
   dependencies = {
     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
