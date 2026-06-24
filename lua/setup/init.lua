@@ -34,18 +34,18 @@ vim.keymap.set("v", "j", "<Nop>", { noremap = true })
 vim.keymap.set("v", "k", "<Nop>", { noremap = true })
 vim.keymap.set("v", "l", "<Nop>", { noremap = true })
 -- Then set up your custom navigation
-vim.keymap.set("n", "j", "h", { noremap = true }) -- j moves left
-vim.keymap.set("n", "k", "j", { noremap = true }) -- k moves down
-vim.keymap.set("n", "l", "k", { noremap = true }) -- l moves up
-vim.keymap.set("n", ";", "l", { noremap = true }) -- ; moves right
-vim.keymap.set("v", "j", "h", { noremap = true }) -- j moves left
-vim.keymap.set("v", "k", "j", { noremap = true }) -- k moves down
-vim.keymap.set("v", "l", "k", { noremap = true }) -- l moves up
-vim.keymap.set("v", ";", "l", { noremap = true }) -- ; moves right
+vim.keymap.set("n", "j", "h", { noremap = true, desc = "Move left" })
+vim.keymap.set("n", "k", "j", { noremap = true, desc = "Move down" })
+vim.keymap.set("n", "l", "k", { noremap = true, desc = "Move up" })
+vim.keymap.set("n", ";", "l", { noremap = true, desc = "Move right" })
+vim.keymap.set("v", "j", "h", { noremap = true, desc = "Move left" })
+vim.keymap.set("v", "k", "j", { noremap = true, desc = "Move down" })
+vim.keymap.set("v", "l", "k", { noremap = true, desc = "Move up" })
+vim.keymap.set("v", ";", "l", { noremap = true, desc = "Move right" })
 
 -- Delete lines above and below mappings
-vim.keymap.set("n", "dk", "dj", { noremap = true }) -- delete line and line below
-vim.keymap.set("n", "dl", "dk", { noremap = true }) -- delete line and line above
+vim.keymap.set("n", "dk", "dj", { noremap = true, desc = "Delete line and line below" })
+vim.keymap.set("n", "dl", "dk", { noremap = true, desc = "Delete line and line above" })
 -- Example mapping for basic window navigation (Normal mode)
 vim.keymap.set("n", "<C-j>", "<C-w>h", { desc = "Go to left window" })
 vim.keymap.set("n", "<C-k>", "<C-w>j", { desc = "Go to down window" })
