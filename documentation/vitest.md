@@ -10,6 +10,7 @@ All testing keybindings start with `<leader>l`:
 |------------|--------|-------------|
 | `<leader>lr` | Run Nearest | Runs the test or describe block under the cursor. |
 | `<leader>ll` | Run File | Runs all tests in the current file. |
+| `<leader>lL` | Run Last | Runs the last executed test again. |
 | `<leader>ls` | Toggle Summary | Opens a sidebar showing test results and status. |
 | `<leader>lo` | Show Output | Opens a floating window with the raw test output. |
 | `<leader>lO` | Toggle Output Panel | Opens a panel at the bottom for live logs. |

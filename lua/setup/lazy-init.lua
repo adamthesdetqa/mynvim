@@ -165,6 +165,39 @@ vim.lsp.config('lua_ls', {
 })
 vim.lsp.enable('lua_ls')
 
+-- Auto-import missing symbols on save for TS/JS files (via vtsls)
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = vim.api.nvim_create_augroup("AutoAddMissingImports", { clear = true }),
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx", "*.mts", "*.cts" },
+  callback = function(args)
+    local bufnr = args.buf
+    -- Find a client that can provide code actions (e.g. vtsls)
+    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = "textDocument/codeAction" })
+    if #clients == 0 then
+      return
+    end
+    local encoding = clients[1].offset_encoding or "utf-16"
+
+    -- Synchronously request and apply the "add missing imports" source action
+    local params = vim.lsp.util.make_range_params(0, encoding)
+    params.context = {
+      only = { "source.addMissingImports.ts" },
+      diagnostics = {},
+    }
+    local results = vim.lsp.buf_request_sync(bufnr, "textDocument/codeAction", params, 1000)
+    for _, res in pairs(results or {}) do
+      for _, action in pairs(res.result or {}) do
+        if action.edit then
+          vim.lsp.util.apply_workspace_edit(action.edit, encoding)
+        end
+        if type(action.command) == "table" then
+          clients[1]:exec_cmd(action.command, { bufnr = bufnr })
+        end
+      end
+    end
+  end,
+})
+
 -- Autosave on CursorHold event
 vim.opt.updatetime = 5000 -- Time in milliseconds (e.g., 5000ms = 5 seconds)
 vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
