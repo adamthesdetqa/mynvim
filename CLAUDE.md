@@ -32,7 +32,7 @@ Load order is driven from `init.lua` → `require("setup")`:
 
 - `lazy/` (root) — core editor plugins (cmp, conform, telescope, treesitter, copilot, gitsigns…)
 - `lazy/ui/` — UI plugins (lualine, bufferline, neo-tree, noice, snacks, alpha, menu…)
-- `lazy/debugging/` — dap, neotest, coverage
+- `lazy/debugging/` — neotest, coverage
 - `lazy/mappings/` — plugins whose value is mainly keymaps (fff, substitute, surround)
 - `lazy/windows/` — lazygit, tmux-navigator, trouble
 - `lazy/langs/` — language-specific specs (currently **not imported** — commented out in `lazy-init.lua`)

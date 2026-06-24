@@ -21,6 +21,9 @@ keymap.set({ "n", "t" }, "<leader>ft", function()
 	Snacks.terminal.toggle()
 end, { desc = "Toggle Terminal" })
 
+-- noice message history
+keymap.set("n", "<leader>nm", "<cmd>Noice history<CR>", { desc = "Noice Message History" })
+
 -- normal mode vscode like keymaps
 keymap.set("n", "<M-Up>", ":m-2<CR>", { desc = "move line above" })
 keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
@@ -62,11 +65,12 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 -- reload neovim config
 keymap.set("n", "<leader>rc", function()
 	for name, _ in pairs(package.loaded) do
-		if name:match("^setup") or name == "lazy" then
+		if name:match("^setup") then
 			package.loaded[name] = nil
 		end
 	end
-	dofile(vim.env.MYVIMRC)
+	require("setup.settings")
+	require("setup.keymaps")
 	vim.notify("Configuration reloaded!")
 end, { desc = "Reload Neovim Config" })
 

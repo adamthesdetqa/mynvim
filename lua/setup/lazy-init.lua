@@ -107,8 +107,6 @@ require("mason-tool-installer").setup({
 		"stylua", -- lua formatter
 		"eslint_d", -- js linter
 		"ruff", -- python linter/formatter
-		"debugpy", -- python debugger
-		"js-debug-adapter", -- js debugger
 	},
 })
 
