@@ -67,7 +67,8 @@ keymap.set("n", "<leader>rc", function()
 		end
 	end
 	dofile(vim.env.MYVIMRC)
-	vim.notify("Configuration reloaded!")
+	pcall(vim.cmd, "Lazy reload")
+	vim.notify("Configuration and plugins reloaded!")
 end, { desc = "Reload Neovim Config" })
 
 vim.api.nvim_create_autocmd("LspAttach", {
