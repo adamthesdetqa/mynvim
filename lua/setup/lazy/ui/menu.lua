@@ -6,14 +6,14 @@ return {
     keys = {
       { "<C-t>", function()
           local options = vim.bo.filetype == "neo-tree" and "neo-tree" or "default"
-          require("menu").open(options, { border = true })
+          require("menu").open(options)
         end, mode = "n", desc = "Open Menu" },
       { "<RightMouse>", function()
           vim.cmd.exec '"normal! \\<RightMouse>"'
           local winid = vim.fn.getmousepos().winid
           local buf = vim.api.nvim_win_get_buf(winid)
           local options = vim.bo[buf].filetype == "neo-tree" and "neo-tree" or "default"
-          require("menu").open(options, { mouse = true, border = true })
+          require("menu").open(options, { mouse = true })
         end, mode = "n", desc = "Open Menu" }
     },
     config = function()
@@ -33,17 +33,12 @@ return {
             
             -- Map Spacebar to select the current option
             vim.keymap.set("n", "<Space>", "<CR>", { buffer = buf, remap = true, desc = "Select Menu Item" })
+            
+            -- Ensure 'q' cleanly closes the menu
+            vim.keymap.set("n", "q", function() 
+              require("volt.utils").close({ bufs = vim.tbl_keys(require("menu.state").bufs) })
+            end, { buffer = buf, remap = false, desc = "Close Menu" })
           end)
-        end,
-      })
-
-      -- Force a redraw when the menu closes to clear any black UI artifacts
-      vim.api.nvim_create_autocmd("WinClosed", {
-        pattern = "*",
-        callback = function(args)
-          if args.buf and vim.api.nvim_buf_is_valid(args.buf) and vim.bo[args.buf].filetype == "NvMenu" then
-            vim.schedule(function() vim.cmd("redraw!") end)
-          end
         end,
       })
     end,
