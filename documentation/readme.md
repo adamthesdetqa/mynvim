@@ -20,10 +20,11 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 - **File Explorer**: `Neo-tree` for a modern, sidebar-based file navigation.
 - **Fuzzy Finder**: `Telescope` for finding files, strings, and more.
 - **Terminal**: Integrated terminal support via `snacks.nvim`.
-- **Git**: `Gitsigns` for inline status and `LazyGit` for full repository management.
+- **Git**: [Gitsigns](./gitsigns.md) for inline status and `LazyGit` for full repository management.
 - **Debugging**: `nvim-dap` with `nvim-dap-ui`.
 - **Testing**: `neotest` with support for Jest (Angular) and Pytest.
 - **AI**: GitHub Copilot and Copilot Chat integration.
+- **Syntax Selection**: [Treesitter Incremental Selection & Textobjects](./treesitter.md) for smart selection and deletion.
 - **UI**: `lualine` (statusline), `bufferline` (tabs), `alpha-nvim` (dashboard), and `nightfly` colorscheme.
 
 ---
