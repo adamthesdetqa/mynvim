@@ -34,10 +34,22 @@ return {
             -- Map Spacebar to select the current option
             vim.keymap.set("n", "<Space>", "<CR>", { buffer = buf, remap = true, desc = "Select Menu Item" })
             
-            -- Ensure 'q' cleanly closes the menu
-            vim.keymap.set("n", "q", function() 
-              require("volt.utils").close({ bufs = vim.tbl_keys(require("menu.state").bufs) })
-            end, { buffer = buf, remap = false, desc = "Close Menu" })
+            -- Cleanly close the menu and clear artifacts
+            local close_menu = function()
+              local win = vim.fn.bufwinid(buf)
+              if win ~= -1 and vim.api.nvim_win_is_valid(win) then
+                vim.api.nvim_win_close(win, true)
+              end
+              if vim.api.nvim_buf_is_valid(buf) then
+                vim.api.nvim_buf_delete(buf, { force = true })
+              end
+              require("menu.state").bufs = {}
+              require("menu.state").bufids = {}
+              vim.schedule(function() vim.cmd("redraw!") end)
+            end
+
+            vim.keymap.set("n", "q", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
+            vim.keymap.set("n", "<Esc>", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
           end)
         end,
       })
