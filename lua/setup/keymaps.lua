@@ -8,8 +8,9 @@ local keymap = vim.keymap -- for conciseness
 -- General Keymaps -------------------
 --
 keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
--- use jk to exit insert mode
+-- use jk to exit insert/visual mode
 keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
+keymap.set("v", "jk", "<ESC>", { desc = "Exit visual mode with jk" })
 keymap.set("t", "jk", [[<C-\><C-n>]], { desc = "Exit terminal mode with jk" })
 
 -- terminal
@@ -57,6 +58,17 @@ keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" 
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
+
+-- reload neovim config
+keymap.set("n", "<leader>rc", function()
+	for name, _ in pairs(package.loaded) do
+		if name:match("^setup") then
+			package.loaded[name] = nil
+		end
+	end
+	dofile(vim.env.MYVIMRC)
+	vim.notify("Configuration reloaded!")
+end, { desc = "Reload Neovim Config" })
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
