@@ -50,7 +50,7 @@ return {
 		{
 			"<leader>lT",
 			function()
-				require("neotest").run.run(require("utils.path").current_project_root())
+				require("neotest").run.run(vim.uv.cwd())
 			end,
 			desc = "Run Project",
 		},
@@ -69,7 +69,7 @@ return {
 			desc = "Run Nearest",
 		},
 		{
-			"<leader>ll",
+			"<leader>lL",
 			function()
 				require("neotest").run.run_last()
 			end,
