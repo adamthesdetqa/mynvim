@@ -22,7 +22,7 @@ require("lazy").setup({
 	{ "williamboman/mason-lspconfig.nvim" },
 	{ "WhoIsSethDaniel/mason-tool-installer.nvim" },
 	{ "neovim/nvim-lspconfig" },
-	-- { "hrsh7th/cmp-nvim-lsp" },
+	{ "hrsh7th/cmp-nvim-lsp" }, -- must load at startup so require("cmp_nvim_lsp") works in LSP handlers
 	-- { "hrsh7th/nvim-cmp" },
 	{ "nvim-neotest/nvim-nio" },
 	-- Git related plugins

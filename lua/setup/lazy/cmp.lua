@@ -28,7 +28,6 @@ return {
 				["<C-l>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<CR>"] = cmp.mapping.confirm({ select = auto_select }),
-				["<C-y>"] = cmp.mapping.confirm({ select = true }),
 				["<S-CR>"] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace }),
 				["<C-CR>"] = function(fallback)
 					cmp.abort()
@@ -76,15 +75,16 @@ return {
 					winhighlight = "Normal:Pmenu,FloatBorder:PmenuBorder",
 				}),
 			},
-			-- sorting = defaults.sorting,
-			vim.cmd([[
-				highlight Pmenu guibg=#141414 guifg=#FFFFFF
-				highlight PmenuSel guibg=#262626 guifg=#F9B044
-				highlight PmenuBorder guifg=#B07F35
-				highlight NormalFloat guibg=#141414
-				highlight FloatBorder guifg=#1A1A1A guibg=#141414
-				highlight CursorLine guibg=#262626
-]]),
 		}
+	end,
+	config = function()
+		vim.cmd([[
+			highlight Pmenu guibg=#141414 guifg=#FFFFFF
+			highlight PmenuSel guibg=#262626 guifg=#F9B044
+			highlight PmenuBorder guifg=#B07F35
+			highlight NormalFloat guibg=#141414
+			highlight FloatBorder guifg=#1A1A1A guibg=#141414
+			highlight CursorLine guibg=#262626
+		]])
 	end,
 }
