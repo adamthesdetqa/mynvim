@@ -21,7 +21,6 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 - **Fuzzy Finder**: `Telescope` for finding files, strings, and more.
 - **Terminal**: Integrated terminal support via `snacks.nvim`.
 - **Git**: [Gitsigns](./gitsigns.md) for inline status and `LazyGit` for full repository management.
-- **Debugging**: `nvim-dap` with `nvim-dap-ui`.
 - **Testing**: `neotest` with support for Jest (Angular) and Pytest.
 - **AI**: GitHub Copilot and Copilot Chat integration.
 - **Syntax Selection**: [Treesitter Incremental Selection & Textobjects](./treesitter.md) for smart selection and deletion.
@@ -89,14 +88,6 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 - `<leader>gg`: Open LazyGit
 - `]h`: Next hunk (Gitsigns)
 - `[h`: Previous hunk (Gitsigns)
-
-### Debugging (DAP)
-- `<F5>`: Start/Continue
-- `<F10>`: Step Over
-- `<F11>`: Step Into
-- `<F12>`: Step Out
-- `<leader>db`: Toggle Breakpoint
-- `<leader>du`: Toggle Debugger UI
 
 ### Testing (neotest)
 - `<leader>lr`: Run Nearest test

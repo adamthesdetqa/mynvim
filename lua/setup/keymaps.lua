@@ -21,6 +21,9 @@ keymap.set({ "n", "t" }, "<leader>ft", function()
 	Snacks.terminal.toggle()
 end, { desc = "Toggle Terminal" })
 
+-- noice message history
+keymap.set("n", "<leader>nm", "<cmd>Noice history<CR>", { desc = "Noice Message History" })
+
 -- normal mode vscode like keymaps
 keymap.set("n", "<M-Up>", ":m-2<CR>", { desc = "move line above" })
 keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
@@ -66,7 +69,8 @@ keymap.set("n", "<leader>rc", function()
 			package.loaded[name] = nil
 		end
 	end
-	dofile(vim.env.MYVIMRC)
+	require("setup.settings")
+	require("setup.keymaps")
 	vim.notify("Configuration reloaded!")
 end, { desc = "Reload Neovim Config" })
 
@@ -88,7 +92,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
 
 		opts.desc = "Show LSP implementations"
-		keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client and client.supports_method("textDocument/implementation") then
+			keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+		end
 
 		opts.desc = "Show LSP type definitions"
 		keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
@@ -110,9 +117,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		opts.desc = "Go to next diagnostic"
 		keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
-
-		opts.desc = "Show documentation for what is under cursor"
-		keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
 		opts.desc = "Restart LSP"
 		keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary

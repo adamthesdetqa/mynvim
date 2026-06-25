@@ -22,7 +22,7 @@ require("lazy").setup({
 	{ "williamboman/mason-lspconfig.nvim" },
 	{ "WhoIsSethDaniel/mason-tool-installer.nvim" },
 	{ "neovim/nvim-lspconfig" },
-	-- { "hrsh7th/cmp-nvim-lsp" },
+	{ "hrsh7th/cmp-nvim-lsp" }, -- must load at startup so require("cmp_nvim_lsp") works in LSP handlers
 	-- { "hrsh7th/nvim-cmp" },
 	{ "nvim-neotest/nvim-nio" },
 	-- Git related plugins
@@ -107,8 +107,6 @@ require("mason-tool-installer").setup({
 		"stylua", -- lua formatter
 		"eslint_d", -- js linter
 		"ruff", -- python linter/formatter
-		"debugpy", -- python debugger
-		"js-debug-adapter", -- js debugger
 	},
 })
 
