@@ -1,7 +1,87 @@
+local function get_neotree_menu()
+  local manager = require "neo-tree.sources.manager"
+  local cc = require "neo-tree.sources.common.commands"
+
+  -- Capture state now, while neo-tree window still has focus.
+  local state = manager.get_state_for_window()
+  if not state then return "default" end
+  state.config = state.config or {}
+
+  local function close_all_menus()
+    local ok, ms = pcall(require, "menu.state")
+    if not ok then return end
+    for _, bufid in ipairs(ms.bufids or {}) do
+      local winid = vim.fn.bufwinid(bufid)
+      if winid ~= -1 and vim.api.nvim_win_is_valid(winid) then
+        pcall(vim.api.nvim_win_close, winid, true)
+      end
+    end
+    ms.bufs = {}
+    ms.bufids = {}
+    ms.config = nil
+    ms.nested_menu = ""
+    vim.cmd "redraw!"
+  end
+
+  local function call(what)
+    return vim.schedule_wrap(function()
+      close_all_menus()
+      local cb = require("neo-tree.sources." .. state.name .. ".commands")[what] or cc[what]
+      cb(state)
+    end)
+  end
+
+  local function copy_path(how)
+    return vim.schedule_wrap(function()
+      close_all_menus()
+      local node = state.tree:get_node()
+      if node.type == "message" then return end
+      vim.fn.setreg('"', vim.fn.fnamemodify(node.path, how))
+      vim.fn.setreg("+", vim.fn.fnamemodify(node.path, how))
+    end)
+  end
+
+  local function open_in_terminal()
+    return vim.schedule_wrap(function()
+      close_all_menus()
+      local node = state.tree:get_node()
+      if node.type == "message" then return end
+      local path = node.path
+      local node_type = vim.uv.fs_stat(path).type
+      local dir = node_type == "directory" and path or vim.fn.fnamemodify(path, ":h")
+      vim.cmd "enew"
+      vim.fn.termopen { vim.o.shell, "-c", "cd " .. dir .. " ; " .. vim.o.shell }
+    end)
+  end
+
+  return {
+    { name = "  Open in window",           cmd = call "open",              rtxt = "o" },
+    { name = "  Open in vertical split",   cmd = call "open_vsplit",       rtxt = "v" },
+    { name = "  Open in horizontal split", cmd = call "open_split",        rtxt = "s" },
+    { name = "󰓪  Open in new tab",         cmd = call "open_tabnew",       rtxt = "O" },
+    { name = "separator" },
+    { name = "  New file",                 cmd = call "add",               rtxt = "a" },
+    { name = "  New folder",               cmd = call "add_directory",     rtxt = "A" },
+    { name = "  Delete",       hl = "ExRed",  cmd = call "delete",         rtxt = "d" },
+    { name = "   File details",            cmd = call "show_file_details", rtxt = "i" },
+    { name = "  Rename",                   cmd = call "rename",            rtxt = "r" },
+    { name = "  Copy",                     cmd = call "copy_to_clipboard", rtxt = "y" },
+    { name = "  Cut",                      cmd = call "cut_to_clipboard",  rtxt = "x" },
+    { name = "  Paste",                    cmd = call "paste_from_clipboard", rtxt = "p" },
+    { name = "separator" },
+    { name = "Toggle hidden",              cmd = call "toggle_hidden",     rtxt = "H" },
+    { name = "Refresh",                    cmd = call "refresh",           rtxt = "R" },
+    { name = "separator" },
+    { name = "󰴠  Copy absolute path",      cmd = copy_path ":p",          rtxt = "gy" },
+    { name = "  Copy relative path",       cmd = copy_path ":~:.",         rtxt = "Y" },
+    { name = "  Open in terminal", hl = "ExBlue", cmd = open_in_terminal() },
+  }
+end
+
 local function get_context_menu(bufnr)
   local ft = vim.bo[bufnr].filetype
   if ft == "neo-tree" then
-    return "neo-tree"
+    return get_neotree_menu()
   end
   
   local menu_items = {}
@@ -98,6 +178,7 @@ return {
     },
     config = function()
       -- Fix navigation for NvMenu buffer based on your custom hjkl layout
+
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "NvMenu",
         callback = function(args)
@@ -106,40 +187,44 @@ return {
             -- Remap 'j' to left, ';' to right to navigate nested menus
             vim.keymap.set("n", "j", function() require("menu.utils").switch_win(-1) end, { buffer = buf, desc = "Prev Menu" })
             vim.keymap.set("n", ";", function() require("menu.utils").switch_win(1) end, { buffer = buf, desc = "Next Menu" })
-            
+
             -- Remap 'l' to up, 'k' to down (matching your init.lua settings)
             vim.keymap.set("n", "l", "k", { buffer = buf, remap = false, desc = "Menu Up" })
             vim.keymap.set("n", "k", "j", { buffer = buf, remap = false, desc = "Menu Down" })
-            
-            -- Map Spacebar to select the current option
+
+                        -- Map Spacebar to select the current option
             vim.keymap.set("n", "<Space>", "<CR>", { buffer = buf, remap = true, desc = "Select Menu Item" })
             
-            -- Cleanly close the menu and clear artifacts
+            -- Ensure 'q' cleanly closes the menu
             local close_menu = function()
-              local state = require("menu.state")
+              local ok, utils = pcall(require, "volt.utils")
+              local s_ok, state = pcall(require, "menu.state")
+              if ok and s_ok then
+                utils.close({ 
+                  bufs = vim.tbl_keys(state.bufs or {}),
+                  after_close = function()
+                    state.bufs = {}
+                    state.config = nil
+                    state.nested_menu = ""
 
-              -- Close all menu windows
-              for _, win_id in ipairs(state.bufs or {}) do
-                if vim.api.nvim_win_is_valid(win_id) then
-                  vim.api.nvim_win_close(win_id, true)
-                end
+                    if state.old_data and state.old_data.win and vim.api.nvim_win_is_valid(state.old_data.win) then
+                      vim.api.nvim_set_current_win(state.old_data.win)
+                      vim.schedule(function()
+                        if state.old_data.cursor then
+                          local cursor_line = math.max(1, state.old_data.cursor[1])
+                          local cursor_col = math.max(0, state.old_data.cursor[2])
+                          pcall(vim.api.nvim_win_set_cursor, state.old_data.win, { cursor_line, cursor_col })
+                        end
+                      end)
+                    end
+
+                    state.bufids = {}
+                    vim.schedule(function() vim.cmd("redraw!") end)
+                  end
+                })
               end
-
-              -- Delete all menu buffers
-              for _, buf_id in ipairs(state.bufids or {}) do
-                if vim.api.nvim_buf_is_valid(buf_id) then
-                  vim.api.nvim_buf_delete(buf_id, { force = true })
-                end
-              end
-
-              -- Clear state
-              state.bufs = {}
-              state.bufids = {}
-
-              -- Full redraw to clear any visual artifacts
-              vim.cmd("redraw!")
             end
-
+            
             vim.keymap.set("n", "q", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
             vim.keymap.set("n", "<Esc>", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
           end)
