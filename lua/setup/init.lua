@@ -19,9 +19,21 @@ vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSig
 vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
-require("setup.lazy-init")
+-- Load core settings (works in both VS Code and terminal)
 require("setup.settings")
-require("setup.keymaps")
+
+-- Isolate VS Code-specific configuration from terminal Neovim
+if vim.g.vscode then
+	-- VS Code Neovim extension is running
+	-- Load only keymaps and core settings (no UI plugins)
+	require("setup.keymaps.vscode")
+else
+	-- Ordinary Neovim is running in terminal (WezTerm, iTerm, etc.)
+	-- Load all plugins, UI, and terminal-specific keymaps
+	require("setup.lazy-init")
+	require("setup.keymaps")
+end
+
 -- Remap navigation keys in normal mode
 -- First disable original hjkl navigation
 vim.keymap.set("n", "h", "<Nop>", { noremap = true })
