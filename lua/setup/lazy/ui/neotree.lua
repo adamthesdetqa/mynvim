@@ -140,7 +140,10 @@ return {
 				-- A list of functions, each representing a global custom command
 				-- that will be available in all sources (if not overridden in `opts[source_name].commands`)
 				-- see `:h neo-tree-custom-commands-global`
-				commands = {},
+				commands = {
+					prev_node = function() vim.cmd("normal! k") end,
+					next_node = function() vim.cmd("normal! j") end,
+				},
 				window = {
 					position = "left",
 					width = 30,
@@ -200,7 +203,7 @@ return {
 						[">"] = "next_source",
 						["l"] = "prev_node",
 						["k"] = "next_node",
-						["i"] = "show_file_details",	
+						["i"] = "show_file_details",
 						[";"] = "open",
 						["j"] = "close_node",
 	
