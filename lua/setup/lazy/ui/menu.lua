@@ -1,3 +1,75 @@
+-- nvzone/menu leaves its floating windows behind unless every menu buffer is
+-- torn down through volt (which also drops the buffer from volt.state and the
+-- volt.events hover/click table). Closing only the window, as we used to, left
+-- the buffer alive and its border painted on screen.
+local function close_menus()
+  local ok_state, ms = pcall(require, "menu.state")
+  local ok_volt, volt_utils = pcall(require, "volt.utils")
+  if not (ok_state and ok_volt) then return end
+
+  local bufs = {}
+  local seen = {}
+  for _, buf in ipairs(ms.bufids or {}) do
+    if not seen[buf] then
+      seen[buf] = true
+      table.insert(bufs, buf)
+    end
+  end
+  for buf in pairs(ms.bufs or {}) do
+    if not seen[buf] then
+      seen[buf] = true
+      table.insert(bufs, buf)
+    end
+  end
+  if #bufs == 0 then return end
+
+  -- Grab the windows now: once the buffers are wiped, a float that survived
+  -- would be showing some unrelated buffer and we'd have no way to spot it.
+  local wins = {}
+  for _, buf in ipairs(bufs) do
+    local win = vim.fn.bufwinid(buf)
+    if win ~= -1 then table.insert(wins, win) end
+  end
+
+  local old_data = ms.old_data
+
+  volt_utils.close {
+    bufs = bufs,
+    after_close = function()
+      ms.bufs = {}
+      ms.bufids = {}
+      ms.config = nil
+      ms.nested_menu = ""
+
+      if old_data and old_data.win and vim.api.nvim_win_is_valid(old_data.win) then
+        pcall(vim.api.nvim_set_current_win, old_data.win)
+        if old_data.cursor then
+          pcall(vim.api.nvim_win_set_cursor, old_data.win, {
+            math.max(1, old_data.cursor[1]),
+            math.max(0, old_data.cursor[2]),
+          })
+        end
+      end
+    end,
+  }
+
+  -- Belt and braces: any menu float volt left standing is the ghost box.
+  for _, win in ipairs(wins) do
+    if vim.api.nvim_win_is_valid(win) then
+      pcall(vim.api.nvim_win_close, win, true)
+    end
+  end
+end
+
+-- Has to run after the menu action itself: a command that repaints (neo-tree
+-- refresh, a nui popup, an :edit) would otherwise repaint over a cleared cell
+-- and leave the old border visible.
+local function force_redraw()
+  vim.schedule(function()
+    vim.cmd "redraw!"
+  end)
+end
+
 local function get_neotree_menu()
   local manager = require "neo-tree.sources.manager"
   local cc = require "neo-tree.sources.common.commands"
@@ -7,33 +79,24 @@ local function get_neotree_menu()
   if not state then return "default" end
   state.config = state.config or {}
 
-  local function close_all_menus()
-    local ok, ms = pcall(require, "menu.state")
-    if not ok then return end
-    for _, bufid in ipairs(ms.bufids or {}) do
-      local winid = vim.fn.bufwinid(bufid)
-      if winid ~= -1 and vim.api.nvim_win_is_valid(winid) then
-        pcall(vim.api.nvim_win_close, winid, true)
-      end
-    end
-    ms.bufs = {}
-    ms.bufids = {}
-    ms.config = nil
-    ms.nested_menu = ""
-    vim.cmd "redraw!"
+  -- Wrap a menu action: tear the menu down, run it, then repaint.
+  local function action(fn)
+    return vim.schedule_wrap(function()
+      close_menus()
+      fn()
+      force_redraw()
+    end)
   end
 
   local function call(what)
-    return vim.schedule_wrap(function()
-      close_all_menus()
+    return action(function()
       local cb = require("neo-tree.sources." .. state.name .. ".commands")[what] or cc[what]
       cb(state)
     end)
   end
 
   local function copy_path(how)
-    return vim.schedule_wrap(function()
-      close_all_menus()
+    return action(function()
       local node = state.tree:get_node()
       if node.type == "message" then return end
       vim.fn.setreg('"', vim.fn.fnamemodify(node.path, how))
@@ -42,8 +105,7 @@ local function get_neotree_menu()
   end
 
   local function open_in_terminal()
-    return vim.schedule_wrap(function()
-      close_all_menus()
+    return action(function()
       local node = state.tree:get_node()
       if node.type == "message" then return end
       local path = node.path
@@ -195,36 +257,13 @@ return {
                         -- Map Spacebar to select the current option
             vim.keymap.set("n", "<Space>", "<CR>", { buffer = buf, remap = true, desc = "Select Menu Item" })
             
-            -- Ensure 'q' cleanly closes the menu
+            -- Same teardown the menu actions use, so q/<Esc> can't leave a
+            -- half-closed menu (buffer alive, border still on screen) behind.
             local close_menu = function()
-              local ok, utils = pcall(require, "volt.utils")
-              local s_ok, state = pcall(require, "menu.state")
-              if ok and s_ok then
-                utils.close({ 
-                  bufs = vim.tbl_keys(state.bufs or {}),
-                  after_close = function()
-                    state.bufs = {}
-                    state.config = nil
-                    state.nested_menu = ""
-
-                    if state.old_data and state.old_data.win and vim.api.nvim_win_is_valid(state.old_data.win) then
-                      vim.api.nvim_set_current_win(state.old_data.win)
-                      vim.schedule(function()
-                        if state.old_data.cursor then
-                          local cursor_line = math.max(1, state.old_data.cursor[1])
-                          local cursor_col = math.max(0, state.old_data.cursor[2])
-                          pcall(vim.api.nvim_win_set_cursor, state.old_data.win, { cursor_line, cursor_col })
-                        end
-                      end)
-                    end
-
-                    state.bufids = {}
-                    vim.schedule(function() vim.cmd("redraw!") end)
-                  end
-                })
-              end
+              close_menus()
+              force_redraw()
             end
-            
+
             vim.keymap.set("n", "q", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
             vim.keymap.set("n", "<Esc>", close_menu, { buffer = buf, remap = false, desc = "Close Menu" })
           end)

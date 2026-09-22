@@ -21,10 +21,33 @@ The root-level `test_*.lua` / `run_test.lua` files are throwaway debug scripts f
 
 Load order is driven from `init.lua` → `require("setup")`:
 
-1. **`lua/setup/init.lua`** — leader keys, Copilot accept maps, diagnostic signs, then requires `lazy-init`, `settings`, `keymaps`. **This file also defines the custom navigation remap and global autocommands** (see below).
+1. **`lua/setup/init.lua`** — leader keys, Copilot accept maps, diagnostic signs, then requires conditional setup based on `vim.g.vscode`. Also defines the custom navigation remap and global autocommands (see below).
 2. **`lua/setup/lazy-init.lua`** — bootstraps lazy.nvim, imports plugin spec directories, and contains **all LSP configuration** (Mason setup, `vim.lsp.config`/`vim.lsp.enable` per server, plus the auto-import and autosave autocommands). LSP config lives here, not in a dedicated lsp plugin file.
 3. **`lua/setup/settings.lua`** — vanilla `vim.opt` options (2-space indent, folds via foldlevel 99, system clipboard, `exrc` enabled).
-4. **`lua/setup/keymaps.lua`** — general keymaps plus the `LspAttach` autocommand that sets all buffer-local LSP keybinds (`gd`, `gR`, `<leader>ca`, etc.).
+4. **`lua/setup/keymaps.lua`** — general keymaps plus the `LspAttach` autocommand that sets all buffer-local LSP keybinds (`gd`, `gR`, `<leader>ca`, etc.). **Terminal-only** — VS Code uses `keymaps/vscode.lua` instead.
+5. **`lua/setup/keymaps/vscode.lua`** — minimal VS Code-safe keymaps (window management, tabs, basic navigation). **VS Code-only** — no plugin dependencies to avoid errors from UI plugins not present in VS Code.
+
+### VS Code Neovim Integration
+
+The config automatically detects VS Code's Neovim extension and loads a minimal, plugin-free environment:
+
+```lua
+if vim.g.vscode then
+    -- VS Code extension: load only keymaps + settings (no plugins)
+    require("setup.keymaps.vscode")
+else
+    -- Terminal Neovim: load all plugins, UI, and full keymaps
+    require("setup.lazy-init")
+    require("setup.keymaps")
+end
+```
+
+This means:
+- **In VS Code:** Only essential keymaps (window splits, tabs, line movement) and core settings load. UI plugins, LSP config, and plugin-dependent keymaps are skipped.
+- **In Terminal:** All plugins (Telescope, Snacks, LSP, etc.) and full keymaps load normally.
+- **Custom navigation** (j/k/l/;) works identically in both environments.
+
+If you need to add keymaps that work **only in VS Code**, add them to `lua/setup/keymaps/vscode.lua`. For **terminal-only** keymaps that depend on plugins, add them to `lua/setup/keymaps.lua`.
 
 ### Plugin specs
 

@@ -77,7 +77,8 @@ return {
 			},
 		}
 	end,
-	config = function()
+	config = function(_, opts)
+		require("cmp").setup(opts)
 		vim.cmd([[
 			highlight Pmenu guibg=#141414 guifg=#FFFFFF
 			highlight PmenuSel guibg=#262626 guifg=#F9B044

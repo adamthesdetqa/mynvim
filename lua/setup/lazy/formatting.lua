@@ -14,6 +14,7 @@ return {
 				css = { "prettier", "dprint", stop_after_first = true },
 				scss = { "prettier", "dprint", stop_after_first = true },
 				html = { "prettier", "dprint", stop_after_first = true },
+				htmlangular = { "prettier", "dprint", stop_after_first = true },
 				json = { "prettier", "dprint", stop_after_first = true },
 				markdown = { "prettier", "dprint", stop_after_first = true },
 				graphql = { "prettier" },
