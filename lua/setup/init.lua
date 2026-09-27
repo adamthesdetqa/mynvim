@@ -14,10 +14,16 @@ vim.keymap.set("i", "<C-;>", "copilot#AcceptWord()", {
 	silent = true,
 })
 
-vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" }) -- Smaller dot
-vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
-vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
-vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
+vim.diagnostic.config({
+	signs = {
+		text = {
+			[vim.diagnostic.severity.ERROR] = "",
+			[vim.diagnostic.severity.WARN] = "",
+			[vim.diagnostic.severity.INFO] = "",
+			[vim.diagnostic.severity.HINT] = "",
+		},
+	},
+})
 
 -- Load core settings (works in both VS Code and terminal)
 require("setup.settings")
@@ -79,13 +85,7 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
 	end,
 })
 
--- some hacky generated stuff
 vim.keymap.set("n", "K", function()
-	local winid = vim.fn.bufwinid("[Lsp Hover]") -- Check if hover is open
-	if winid ~= -1 then
-		vim.cmd("wincmd p") -- Jump into hover window if it's open
-	else
-		vim.lsp.buf.hover()
-	end
-end, { noremap = true, silent = true })
+	vim.lsp.buf.hover()
+end, { noremap = true, silent = true, desc = "LSP Hover / Focus Hover Window" })
 vim.keymap.set("n", "<C-z>", "zt", { noremap = true, silent = true, desc = "Move current line to top" })
