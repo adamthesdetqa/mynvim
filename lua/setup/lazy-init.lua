@@ -14,7 +14,7 @@ require("lazy").setup({
 	change_detection = { notify = false },
 	{ import = "setup.lazy" },
 	{ import = "setup.lazy.debugging" },
-	-- { import = "setup.lazy.langs" },
+	{ import = "setup.lazy.langs" },
 	{ import = "setup.lazy.mappings" },
 	{ import = "setup.lazy.ui" },
 	{ import = "setup.lazy.windows" },
@@ -109,6 +109,7 @@ if has_mason then
 			"stylua", -- lua formatter
 			"eslint_d", -- js linter
 			"ruff", -- python linter/formatter
+			"debugpy", -- python debug adapter, used by nvim-dap-python
 		},
 	})
 end
