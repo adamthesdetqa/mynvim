@@ -20,11 +20,11 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 - **File Explorer**: `Neo-tree` for a modern, sidebar-based file navigation.
 - **Fuzzy Finder**: `Telescope` for finding files, strings, and more.
 - **Terminal**: Integrated terminal support via `snacks.nvim`.
-- **Git**: [Gitsigns](./gitsigns.md) for inline status and `LazyGit` for full repository management.
-- **Testing**: `neotest` with support for Jest (Angular) and Pytest.
-- **AI**: GitHub Copilot and Copilot Chat integration.
+- **Git**: [Gitsigns](./gitsigns.md) for inline hunk status, staging, and blame.
+- **Testing**: `neotest` with support for Jest (Angular), [Vitest](./vitest.md), and [Pytest](./python.md).
+- **Python & Jupyter**: [Python Development Guide](./python.md) (`pyright`, `ruff`, `venv-selector`, `nvim-dap`, `molten-nvim` / `quarto-nvim`).
 - **Syntax Selection**: [Treesitter Incremental Selection & Textobjects](./treesitter.md) for smart selection and deletion.
-- **UI**: `lualine` (statusline), `bufferline` (tabs), `alpha-nvim` (dashboard), and `nightfly` colorscheme.
+- **UI**: `lualine` (statusline), `bufferline` (tabs), `alpha-nvim` (dashboard), and `tokyonight` colorscheme.
 
 ---
 
@@ -49,10 +49,14 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 
 ### General
 - `jk`: Exit Insert/Terminal mode
+- `<leader>?`: Show all keymaps (Which-Key)
 - `<leader>nh`: Clear search highlights
+- `<leader>nm`: Noice message history
 - `<leader>+`: Increment number
 - `<leader>-`: Decrement number
 - `<leader>sm`: Maximize/Minimize split
+- `<leader>rr`: Run current file (Python, JS, TS, Go, Lua, Shell)
+- `<leader>rc`: Reload Neovim config
 - `<C-z>`: Center current line to top
 
 ### Terminal (snacks.nvim)
@@ -62,53 +66,64 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 ### File Explorer (Neo-tree)
 - `<leader>e`: Toggle Neo-tree
 
-### Fuzzy Finder (Telescope)
+### Fuzzy Finder (Telescope — `<leader>f`)
 - `<leader>ff`: Find files in CWD
 - `<leader>fr`: Find recent files
+- `<leader>fb`: Find open buffers
 - `<leader>fs`: Find string in CWD (Live Grep)
 - `<leader>fc`: Find string under cursor
-- `<leader>ft`: Find TODOs
+- `<leader>fd`: Find Document Symbols (LSP)
+- `<leader>fw`: Find Workspace Symbols (LSP)
+- `<leader>fh`: Find Help Tags
+- `<leader>fk`: Find Keymaps
+- `<leader>fT`: Find TODOs
 
-### LSP (Language Server Protocol)
-- `gR`: Show references (Telescope)
-- `gd`: Show definitions (Telescope)
-- `gi`: Show implementations (Telescope)
-- `gt`: Show type definitions (Telescope)
-- `gD`: Go to declaration
+### LSP & Code (`<leader>g` / `<leader>c` / `<leader>r` / `<leader>x`)
+- `gd` / `<leader>gd`: Show definitions (Telescope)
+- `gD` / `<leader>gD`: Go to declaration
+- `gR` / `<leader>gr` / `<leader>gR`: Show references (Telescope)
+- `gi` / `<leader>gi`: Show implementations (Telescope)
+- `gt` / `<leader>gt`: Show type definitions (Telescope)
 - `K`: Show documentation / Jump into hover window
 - `<leader>ca`: Code actions (Normal & Visual)
+- `<leader>co`: Organize imports (Python `ruff`, TS/JS/Go LSP)
+- `<leader>cl`: LSP Info
+- `<leader>cm`: Open Mason
+- `<leader>mp`: Format file or range (Conform)
 - `<leader>rn`: Smart rename
-- `<leader>D`: Show buffer diagnostics (Telescope)
-- `<leader>d`: Show line diagnostics
-- `[d`: Previous diagnostic
-- `]d`: Next diagnostic
 - `<leader>rs`: Restart LSP
+- `<leader>d`: Show line diagnostics (Float)
+- `<leader>D`: Show buffer diagnostics (Telescope)
+- `[d` / `]d`: Previous / Next diagnostic
+- `<leader>xx` / `<leader>xw`: Workspace diagnostics (Trouble)
+- `<leader>xd`: Buffer diagnostics (Trouble)
+- `<leader>xs`: Document symbols (Trouble)
+- `<leader>xr`: LSP definitions / references (Trouble)
 
-### Git
-- `<leader>gg`: Open LazyGit
-- `]h`: Next hunk (Gitsigns)
-- `[h`: Previous hunk (Gitsigns)
+### Git Hunks (Gitsigns — `<leader>h`)
+- `]h` / `[h`: Next / Previous hunk
+- `<leader>hs` / `<leader>hr`: Stage / Reset hunk
+- `<leader>hS` / `<leader>hR`: Stage / Reset buffer
+- `<leader>hp`: Preview hunk
+- `<leader>hb` / `<leader>hB`: Blame line / Toggle line blame
+- `<leader>hd` / `<leader>hD`: Diff this
 
-### Testing (neotest)
+### Testing & Coverage (neotest & nvim-coverage — `<leader>l`)
 - `<leader>lr`: Run Nearest test
+- `<leader>ld`: Debug Nearest test (DAP)
 - `<leader>ll`: Run Current File
-- `<leader>lT`: Run Project
+- `<leader>lT` / `<leader>lA`: Run Project / All
+- `<leader>lL`: Run Last test
 - `<leader>ls`: Toggle Summary
-- `<leader>lo`: Show Output
+- `<leader>lo` / `<leader>lO`: Show Output / Toggle Output Panel
 - `<leader>lw`: Toggle Watch mode
+- `<leader>lc` / `<leader>lC` / `<leader>ly`: Toggle / Load / Summary of Test Coverage
 
-### Copilot Chat
-- `<leader>cc`: Toggle Copilot Chat
-- `<leader>ce`: Explain selection (Visual)
-- `<leader>cf`: Fix selection (Visual)
-- `<leader>cd`: Generate Docs (Visual)
-
-### Tabs & Windows
-- `<leader>sv`: Split vertically
-- `<leader>sh`: Split horizontally
-- `<leader>se`: Equalize splits
-- `<leader>sx`: Close current split
-- `<leader>to`: New tab
-- `<leader>tx`: Close current tab
-- `<leader>tn`: Next tab
-- `<leader>tp`: Previous tab
+### Tabs, Splits & Tools
+- `<leader>sv` / `<leader>sh`: Split vertically / horizontally
+- `<leader>se` / `<leader>sx`: Equalize splits / Close current split
+- `<leader>to` / `<leader>tx` / `<leader>tn` / `<leader>tp` / `<leader>tf`: New / Close / Next / Prev / Buffer to Tab
+- `<leader>zc` / `<leader>zo`: Collapse comments / Expand all folds
+- `<leader>md`: Toggle Markdown rendering
+- `<leader>Ls` / `<leader>LS`: Start / Stop Live Server
+- `<leader>od`: Toggle Database UI (Dadbod)

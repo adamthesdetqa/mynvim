@@ -5,7 +5,7 @@ return {
 	},
 	cmd = "DBUI",
 	keys = {
-		{ "<leader>db", "<cmd>DBUI<CR>", desc = "Toggle database UI" },
+		{ "<leader>od", "<cmd>DBUI<CR>", desc = "Toggle database UI" },
 	},
 	init = function()
 		-- Homebrew's libpq is keg-only, so psql is never symlinked onto PATH.

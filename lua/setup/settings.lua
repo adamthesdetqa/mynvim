@@ -1,3 +1,19 @@
+-- pip --user installed CLI tools (e.g. jupytext) land in ~/Library/Python/*/bin and uv tools in
+-- ~/.local/bin, which aren't on PATH in non-interactive shells; ensure they're on PATH here.
+local extra_bins = vim.fn.glob("~/Library/Python/*/bin", false, true)
+table.insert(extra_bins, vim.fn.expand("~/.local/bin"))
+for _, dir in ipairs(extra_bins) do
+	if vim.fn.isdirectory(dir) == 1 and not vim.env.PATH:find(dir, 1, true) then
+		vim.env.PATH = dir .. ":" .. vim.env.PATH
+	end
+end
+
+-- Pin the python3 host provider (used by molten-nvim et al.) explicitly. Left unset, Neovim
+-- searches PATH in order and picks whichever python3 comes first, which silently breaks on this
+-- machine since Homebrew's python3 (no pynvim installed) can outrank the Framework python3 that
+-- actually has pynvim, depending on shell PATH ordering.
+vim.g.python3_host_prog = "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3"
+
 local opt = vim.opt -- for conciseness
 
 -- line numbers

@@ -8,14 +8,13 @@ A personal Neovim configuration (Lua), targeting Node.js / Angular / TypeScript 
 
 ## Commands
 
-There is no test suite or build for the config itself. Iterate by editing Lua and reloading:
+Run the automated config verification and smoke-test suite after editing Lua files:
 
-- **Reload config + plugins in a running session:** `<leader>rc` (unloads every `setup*` Lua module via `package.loaded`, re-`dofile`s `$MYVIMRC`, then `Lazy reload`). Prefer this over `:source` — a plain `dofile` of individual modules will not pick up plugin spec changes.
+- **Verify config (syntax, plugin specs, keymap conflicts, Mason tools, runtime boot):** `nvim -l check.lua`
+- **Reload config + plugins in a running session:** `<leader>rc`
 - **Manage plugins:** `:Lazy` (sync/update/clean). Lock file is `lazy-lock.json`.
 - **Manage LSP servers / tools:** `:Mason`. Servers and CLI tools are auto-installed on startup via `mason-lspconfig` and `mason-tool-installer` (see `lua/setup/lazy-init.lua`).
 - **Format manually:** `<leader>mp` (conform.nvim). Format-on-save is enabled for all configured filetypes.
-
-The root-level `test_*.lua` / `run_test.lua` files are throwaway debug scripts for the nvzone/menu border issue — not a test framework. Ignore them unless working on the context menu.
 
 ## Architecture
 

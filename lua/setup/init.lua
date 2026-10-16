@@ -1,18 +1,5 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
-vim.g.copilot_no_tab_map = true
--- hello
-vim.keymap.set("i", "<C-y>", 'copilot#Accept("\\<CR>")', {
-	expr = true,
-	replace_keycodes = false,
-	silent = true,
-})
-
-vim.keymap.set("i", "<C-;>", "copilot#AcceptWord()", {
-	expr = true,
-	replace_keycodes = false,
-	silent = true,
-})
 
 vim.fn.sign_define("DiagnosticSignError", { text = "", texthl = "DiagnosticSignError" }) -- Smaller dot
 vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSignWarn" })
