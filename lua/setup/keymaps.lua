@@ -32,10 +32,40 @@ keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
 -- keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 -- keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- run current python file
+-- run current file across supported languages (Python, JS/TS, Go, Lua, Shell)
 keymap.set("n", "<leader>rr", function()
-	Snacks.terminal.open("python3 " .. vim.fn.expand("%:p"), { interactive = true })
-end, { desc = "Run current Python file" })
+	local ft = vim.bo.filetype
+	local file = vim.fn.shellescape(vim.fn.expand("%:p"))
+	local cmd
+
+	if ft == "python" then
+		local python = "python3"
+		local ok_vs, vs = pcall(require, "venv-selector")
+		if ok_vs and vs.python() and vs.python() ~= "" then
+			python = vs.python()
+		elseif vim.env.VIRTUAL_ENV and vim.uv.fs_stat(vim.env.VIRTUAL_ENV .. "/bin/python") then
+			python = vim.env.VIRTUAL_ENV .. "/bin/python"
+		elseif vim.uv.fs_stat(vim.fn.getcwd() .. "/.venv/bin/python") then
+			python = vim.fn.getcwd() .. "/.venv/bin/python"
+		end
+		cmd = vim.fn.shellescape(python) .. " " .. file
+	elseif ft == "javascript" then
+		cmd = "node " .. file
+	elseif ft == "typescript" then
+		cmd = "npx tsx " .. file
+	elseif ft == "go" then
+		cmd = "go run " .. file
+	elseif ft == "lua" then
+		cmd = "nvim -l " .. file
+	elseif ft == "sh" or ft == "bash" or ft == "zsh" then
+		cmd = ft .. " " .. file
+	else
+		vim.notify("No runner configured for filetype: " .. (ft ~= "" and ft or "none"), vim.log.levels.WARN)
+		return
+	end
+
+	Snacks.terminal.open(cmd, { interactive = true })
+end, { desc = "Run Current File" })
 
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
@@ -62,6 +92,10 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- LSP / Mason management
+keymap.set("n", "<leader>cl", "<cmd>LspInfo<CR>", { desc = "LSP Info" })
+keymap.set("n", "<leader>cm", "<cmd>Mason<CR>", { desc = "Open Mason" })
+
 -- reload neovim config
 keymap.set("n", "<leader>rc", function()
 	for name, _ in pairs(package.loaded) do
@@ -81,27 +115,42 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		-- See `:help vim.lsp.*` for documentation on any of the below functions
 		local opts = { buffer = ev.buf, silent = true }
 
-		-- set keybinds
+		-- set keybinds (both g* and <leader>g* supported)
 		opts.desc = "Show LSP references"
-		keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
+		keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+		keymap.set("n", "<leader>gR", "<cmd>Telescope lsp_references<CR>", opts)
+		keymap.set("n", "<leader>gr", "<cmd>Telescope lsp_references<CR>", opts)
 
 		opts.desc = "Go to declaration"
-		keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+		keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+		keymap.set("n", "<leader>gD", vim.lsp.buf.declaration, opts)
 
 		opts.desc = "Show LSP definitions"
-		keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+		keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
+		keymap.set("n", "<leader>gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 
 		opts.desc = "Show LSP implementations"
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client and client.supports_method("textDocument/implementation") then
 			keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
+			keymap.set("n", "<leader>gi", "<cmd>Telescope lsp_implementations<CR>", opts)
 		end
 
 		opts.desc = "Show LSP type definitions"
-		keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+		keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
+		keymap.set("n", "<leader>gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
 
 		opts.desc = "See available code actions"
 		keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+
+		opts.desc = "Organize Imports"
+		keymap.set("n", "<leader>co", function()
+			if vim.bo[ev.buf].filetype == "python" then
+				require("conform").format({ bufnr = ev.buf, formatters = { "ruff_organize_imports" } })
+			else
+				vim.lsp.buf.code_action({ context = { only = { "source.organizeImports" }, diagnostics = {} }, apply = true })
+			end
+		end, opts)
 
 		opts.desc = "Smart rename"
 		keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename

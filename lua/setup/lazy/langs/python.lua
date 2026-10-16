@@ -50,22 +50,21 @@ return {
 			vim.g.molten_output_win_max_height = 20
 		end,
 		keys = {
-			{ "<leader>j", "", desc = "+jupyter" },
-			{ "<leader>ji", "<cmd>MoltenInit<CR>", desc = "Init Molten Kernel" },
+			{ "<leader>ji", "<cmd>MoltenInit<CR>", ft = { "python", "quarto" }, desc = "Init Molten Kernel" },
 			-- Evaluate line/operator/visual remain useful for plain .py scripts (no chunks).
 			-- Inside quarto-filetype notebooks, lazy/langs/quarto.lua's FileType autocmd
 			-- shadows <leader>jl/<leader>jv buffer-locally with quarto's chunk-aware runner,
 			-- and adds <leader>jc/ja/jA for cell-based execution (there's no more "# %%"-based
 			-- cell here now that notebooks pair to .qmd chunks instead).
-			{ "<leader>jl", "<cmd>MoltenEvaluateLine<CR>", desc = "Evaluate Line" },
-			{ "<leader>je", "<cmd>MoltenEvaluateOperator<CR>", desc = "Evaluate Operator" },
-			{ "<leader>jv", ":<C-u>MoltenEvaluateVisual<CR>gv", mode = "v", desc = "Evaluate Visual Selection" },
-			{ "<leader>jo", "<cmd>noautocmd MoltenEnterOutput<CR>", desc = "Enter Output Window" },
-			{ "<leader>jy", "<cmd>MoltenYankOutput!<CR>", desc = "Yank Output to Clipboard" },
-			{ "<leader>jh", "<cmd>MoltenHideOutput<CR>", desc = "Hide Output" },
-			{ "<leader>jd", "<cmd>MoltenDelete<CR>", desc = "Delete Cell Output" },
-			{ "<leader>jr", "<cmd>MoltenRestart<CR>", desc = "Restart Kernel" },
-			{ "<leader>jq", "<cmd>MoltenDeinit<CR>", desc = "Stop Molten (buffer)" },
+			{ "<leader>jl", "<cmd>MoltenEvaluateLine<CR>", ft = { "python", "quarto" }, desc = "Evaluate Line" },
+			{ "<leader>je", "<cmd>MoltenEvaluateOperator<CR>", ft = { "python", "quarto" }, desc = "Evaluate Operator" },
+			{ "<leader>jv", ":<C-u>MoltenEvaluateVisual<CR>gv", mode = "v", ft = { "python", "quarto" }, desc = "Evaluate Visual Selection" },
+			{ "<leader>jo", "<cmd>noautocmd MoltenEnterOutput<CR>", ft = { "python", "quarto" }, desc = "Enter Output Window" },
+			{ "<leader>jy", "<cmd>MoltenYankOutput!<CR>", ft = { "python", "quarto" }, desc = "Yank Output to Clipboard" },
+			{ "<leader>jh", "<cmd>MoltenHideOutput<CR>", ft = { "python", "quarto" }, desc = "Hide Output" },
+			{ "<leader>jd", "<cmd>MoltenDelete<CR>", ft = { "python", "quarto" }, desc = "Delete Cell Output" },
+			{ "<leader>jr", "<cmd>MoltenRestart<CR>", ft = { "python", "quarto" }, desc = "Restart Kernel" },
+			{ "<leader>jq", "<cmd>MoltenDeinit<CR>", ft = { "python", "quarto" }, desc = "Stop Molten (buffer)" },
 		},
 	},
 }

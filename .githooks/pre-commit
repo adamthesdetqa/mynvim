@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -e
+
+# Ensure Homebrew and user bin directories are on PATH (for GUI Git clients on macOS)
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH"
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "Running Neovim config pre-commit check..."
+nvim -l "$REPO_ROOT/check.lua"

@@ -1,8 +1,9 @@
--- pip --user installed CLI tools (e.g. jupytext) land in ~/Library/Python/*/bin, which isn't on
--- PATH by default; Neovim's :!/system() calls run non-interactively so they never source .zshrc,
--- so make sure it's on PATH here regardless of how Neovim itself was launched.
-for _, dir in ipairs(vim.fn.glob("~/Library/Python/*/bin", false, true)) do
-	if not vim.env.PATH:find(dir, 1, true) then
+-- pip --user installed CLI tools (e.g. jupytext) land in ~/Library/Python/*/bin and uv tools in
+-- ~/.local/bin, which aren't on PATH in non-interactive shells; ensure they're on PATH here.
+local extra_bins = vim.fn.glob("~/Library/Python/*/bin", false, true)
+table.insert(extra_bins, vim.fn.expand("~/.local/bin"))
+for _, dir in ipairs(extra_bins) do
+	if vim.fn.isdirectory(dir) == 1 and not vim.env.PATH:find(dir, 1, true) then
 		vim.env.PATH = dir .. ":" .. vim.env.PATH
 	end
 end

@@ -76,7 +76,9 @@ return {
 
 				local ok_dap, dap_python = pcall(require, "dap-python")
 				if ok_dap then
-					dap_python.setup(venv_python)
+					dap_python.resolve_python = function()
+						return venv_python
+					end
 				end
 
 				local ok_neotest, neotest = pcall(require, "neotest")
@@ -104,6 +106,7 @@ return {
 		},
 	},
 	keys = {
-		{ "<leader>vs", "<cmd>VenvSelect<CR>", desc = "Select Python venv" },
+		{ "<leader>vs", "<cmd>VenvSelect<CR>", ft = { "python", "quarto" }, desc = "Select Python Venv" },
+		{ "<leader>vc", "<cmd>VenvSelectCached<CR>", ft = { "python", "quarto" }, desc = "Restore Cached Python Venv" },
 	},
 }

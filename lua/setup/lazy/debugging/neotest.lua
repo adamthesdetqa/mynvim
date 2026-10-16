@@ -39,7 +39,6 @@ return {
 		})
 	end,
 	keys = {
-		{ "<leader>l", "", desc = "+test" },
 		{
 			"<leader>ll",
 			function()
@@ -67,6 +66,13 @@ return {
 				require("neotest").run.run()
 			end,
 			desc = "Run Nearest",
+		},
+		{
+			"<leader>ld",
+			function()
+				require("neotest").run.run({ strategy = "dap" })
+			end,
+			desc = "Debug Nearest Test",
 		},
 		{
 			"<leader>lL",
