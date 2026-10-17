@@ -71,8 +71,6 @@ for _, file in ipairs(lua_files) do
 			local stripped = vim.trim(line)
 			if not stripped:match("^%-%-") and not stripped:match("rtxt%s*=") then
 				for key in stripped:gmatch('"(<leader>[^"]+)"') do
-					-- Ignore intentional buffer-local overrides in quarto.lua (which shadow python.lua in quarto buffers)
-					local is_quarto_override = rel:match("quarto%.lua$") and (key == "<leader>jl" or key == "<leader>jv")
 					-- Determine modes if specified on the same line
 					local mode = "n"
 					if stripped:match('map%("v"') or stripped:match('mode%s*=%s*"v"') then
@@ -80,14 +78,12 @@ for _, file in ipairs(lua_files) do
 					elseif stripped:match('mode%s*=%s*{[^}]*"v"') or stripped:match('keymap%.set%({[^}]*"v"') then
 						mode = "nv"
 					end
-					if not is_quarto_override then
-						table.insert(mappings, {
-							key = key,
-							mode = mode,
-							loc = string.format("%s:%d", rel, lnum),
-							line = stripped,
-						})
-					end
+					table.insert(mappings, {
+						key = key,
+						mode = mode,
+						loc = string.format("%s:%d", rel, lnum),
+						line = stripped,
+					})
 				end
 			end
 		end
@@ -188,8 +184,6 @@ local sys_tools = {
 	{ bin = "rg", required = true, desc = "ripgrep (Telescope live_grep)" },
 	{ bin = "fd", required = true, desc = "fd (venv-selector discovery)" },
 	{ bin = "uv", required = false, desc = "uv Python package/venv manager" },
-	{ bin = "jupytext", required = false, desc = "jupytext CLI (.ipynb notebook pairing)" },
-	{ bin = "magick", required = false, desc = "ImageMagick CLI (image.nvim inline notebook plots)" },
 }
 
 for _, tool in ipairs(sys_tools) do
@@ -200,6 +194,14 @@ for _, tool in ipairs(sys_tools) do
 	else
 		warn(string.format("Optional binary not installed: %-8s (%s)", tool.bin, tool.desc))
 	end
+end
+
+-- Check jupynvim-core Rust backend binary
+local jupynvim_bin = vim.fn.stdpath("data") .. "/lazy/jupynvim/core/target/release/jupynvim-core"
+if vim.uv.fs_stat(jupynvim_bin) then
+	pass("jupynvim-core Rust backend binary installed")
+elseif loadfile(vim.fn.stdpath("data") .. "/lazy/lazy.nvim/lua/lazy/init.lua") then
+	fail("jupynvim-core binary missing — run :JupynvimInstall inside Neovim")
 end
 
 -- 5. Full Runtime Boot Check (when ~/.local/share/nvim is accessible)

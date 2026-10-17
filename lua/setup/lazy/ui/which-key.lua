@@ -19,7 +19,7 @@ return {
 			{ "<leader>f", group = "Find (Telescope)", icon = " " },
 			{ "<leader>g", group = "Goto (LSP)", icon = "󰈮 " },
 			{ "<leader>h", group = "Git Hunks (Gitsigns)", icon = " ", mode = { "n", "v" } },
-			{ "<leader>j", group = "Jupyter / Molten", icon = " ", mode = { "n", "v" } },
+			{ "<leader>j", group = "Jupyter (jupynvim)", icon = " ", mode = { "n", "v" } },
 			{ "<leader>l", group = "Test & Coverage (Neotest)", icon = "󰙨 " },
 			{ "<leader>L", group = "Live Server", icon = "󰖟 " },
 			{ "<leader>m", group = "Format & Markdown", icon = "󰉼 ", mode = { "n", "v" } },

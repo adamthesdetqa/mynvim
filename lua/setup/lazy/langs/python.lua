@@ -1,70 +1,91 @@
 return {
 	{
-		"3rd/image.nvim",
-		lazy = true,
-		opts = {
-			backend = "kitty", -- Ghostty/modern WezTerm support the Kitty graphics protocol;
-			-- run `:checkhealth image` after install and switch to "sixel" if rendering is broken
-			processor = "magick_cli", -- requires ImageMagick (see prerequisites)
-			integrations = {},
-			max_width_window_percentage = 80,
-			max_height_window_percentage = 80,
-		},
-	},
-	{
-		"GCBallesteros/jupytext.nvim",
-		lazy = false, -- must load before any .ipynb is read
-		opts = {
-			style = "percent",
-			output_extension = "auto",
-			force_ft = "python",
-			-- Overrides the style above for python-kernel notebooks specifically: pairs
-			-- .ipynb to .qmd with `{python}` curly chunk fences (Quarto's native syntax)
-			-- instead of "# %%" comments, so quarto-nvim/otter.nvim (lazy/langs/quarto.lua)
-			-- get rendered-markdown cells + per-chunk LSP. jupytext keys this by kernel
-			-- language, not by file, so this applies to every python .ipynb uniformly.
-			custom_language_formatting = {
-				python = {
-					extension = "qmd",
-					style = "quarto",
-					force_ft = "quarto", -- required for otter.nvim/quarto-nvim to activate
-				},
-			},
-		},
-	},
-	{
-		"benlubas/molten-nvim",
-		dependencies = { "3rd/image.nvim" },
-		build = ":UpdateRemotePlugins",
-		ft = { "python", "quarto" }, -- jupytext now presents .ipynb buffers as filetype=quarto
-		init = function()
-			vim.g.molten_image_provider = "image.nvim"
-			-- virt_text_output=true (the previous setting) specifically suppresses the floating
-			-- output window from auto-opening, replacing it with virtual text -- which isn't real
-			-- buffer content, so it can't be selected/yanked and only showed once you scrolled to
-			-- it. auto_open_output=true + virt_text_output=false instead pops a real (yankable)
-			-- floating window right below the cell as soon as the cursor is in it.
-			vim.g.molten_auto_open_output = true
-			vim.g.molten_wrap_output = true
-			vim.g.molten_virt_text_output = false
-			vim.g.molten_output_win_max_height = 20
+		"sheng-tse/jupynvim",
+		lazy = false, -- must load so BufReadCmd("*.ipynb") is active before any .ipynb is opened
+		build = function(plugin)
+			local install = loadfile(plugin.dir .. "/lua/jupynvim/install.lua")()
+			install.run(plugin)
 		end,
-		keys = {
-			{ "<leader>ji", "<cmd>MoltenInit<CR>", ft = { "python", "quarto" }, desc = "Init Molten Kernel" },
-			-- Evaluate line/operator/visual remain useful for plain .py scripts (no chunks).
-			-- Inside quarto-filetype notebooks, lazy/langs/quarto.lua's FileType autocmd
-			-- shadows <leader>jl/<leader>jv buffer-locally with quarto's chunk-aware runner,
-			-- and adds <leader>jc/ja/jA for cell-based execution (there's no more "# %%"-based
-			-- cell here now that notebooks pair to .qmd chunks instead).
-			{ "<leader>jl", "<cmd>MoltenEvaluateLine<CR>", ft = { "python", "quarto" }, desc = "Evaluate Line" },
-			{ "<leader>je", "<cmd>MoltenEvaluateOperator<CR>", ft = { "python", "quarto" }, desc = "Evaluate Operator" },
-			{ "<leader>jv", ":<C-u>MoltenEvaluateVisual<CR>gv", mode = "v", ft = { "python", "quarto" }, desc = "Evaluate Visual Selection" },
-			{ "<leader>jo", "<cmd>noautocmd MoltenEnterOutput<CR>", ft = { "python", "quarto" }, desc = "Enter Output Window" },
-			{ "<leader>jy", "<cmd>MoltenYankOutput!<CR>", ft = { "python", "quarto" }, desc = "Yank Output to Clipboard" },
-			{ "<leader>jh", "<cmd>MoltenHideOutput<CR>", ft = { "python", "quarto" }, desc = "Hide Output" },
-			{ "<leader>jd", "<cmd>MoltenDelete<CR>", ft = { "python", "quarto" }, desc = "Delete Cell Output" },
-			{ "<leader>jr", "<cmd>MoltenRestart<CR>", ft = { "python", "quarto" }, desc = "Restart Kernel" },
-			{ "<leader>jq", "<cmd>MoltenDeinit<CR>", ft = { "python", "quarto" }, desc = "Stop Molten (buffer)" },
-		},
+		config = function()
+			require("jupynvim").setup({
+				log_level = "info",
+				image_renderer = "placeholder", -- "placeholder" (Ghostty/Kitty), "kitty", or "chafa"
+				auto_venv = true,
+				-- Do not hijack local Neo-tree (<leader>e), Snacks terminal (<C-/>), or Telescope (<leader>ff)
+				explorer_keys = {},
+				explorer_cwd_keys = {},
+				terminal_keys = {},
+				terminal_right_keys = {},
+				pick_keys = { files = {}, grep = {} },
+				-- Map notebook actions under <leader>j (+Jupyter) so they match your config and
+				-- don't collide with <leader>nm (Noice) or <leader>nh (Clear search highlights)
+				keymaps = {
+					run_advance = "<S-CR>",
+					run_stay = "<C-CR>",
+					run_advance_alt = "<leader>jc",
+					run_all = "<leader>jA",
+					run_above = "<leader>ja",
+					run_below = "<leader>jb",
+					add_above = "<leader>jO",
+					add_below = "<leader>jo",
+					delete_cell = "<leader>jd",
+					move_up = "<leader>jl",
+					move_down = "<leader>jk",
+					to_markdown = "<leader>jm",
+					to_code = "<leader>jy",
+					pick_kernel = "<leader>jK",
+					start_kernel = "<leader>ji",
+					stop_kernel = "<leader>jq",
+					interrupt_kernel = "<leader>jI",
+					restart_kernel = "<leader>jr",
+					expand_output = "<leader>je",
+					hide_output = "<leader>jh",
+					limit_output = "<leader>jL",
+					clear_output = "<leader>jx",
+					clear_all = "<leader>jX",
+					enter_output_dn = "<leader>jf",
+					enter_output_up = "<leader>jF",
+					save_image = "<leader>js",
+					delete_image = "<leader>jD",
+					refresh = "<leader>jR",
+				},
+			})
+
+			-- Adapt jupynvim's notebook cellmode (which binds j=down, k=up buffer-locally)
+			-- to match your custom navigation: j=left, k=down, l=up, ;=right
+			local ok_cm, cellmode = pcall(require, "jupynvim.notebook.cellmode")
+			if ok_cm and type(cellmode.attach) == "function" then
+				local orig_attach = cellmode.attach
+				cellmode.attach = function(buf, api)
+					orig_attach(buf, api)
+					local down_cb, up_cb
+					for _, m in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
+						if m.lhs == "<Down>" then
+							down_cb = m.callback
+						elseif m.lhs == "<Up>" then
+							up_cb = m.callback
+						end
+					end
+					-- Remove buffer-local j so global j -> h (left) works in edit mode
+					pcall(vim.keymap.del, "n", "j", { buffer = buf })
+					if down_cb then
+						vim.keymap.set("n", "k", down_cb, {
+							buffer = buf,
+							silent = true,
+							nowait = true,
+							desc = "jupynvim: next cell (command) / down in cell (edit)",
+						})
+					end
+					if up_cb then
+						vim.keymap.set("n", "l", up_cb, {
+							buffer = buf,
+							silent = true,
+							nowait = true,
+							desc = "jupynvim: prev cell (command) / up in cell (edit)",
+						})
+					end
+				end
+			end
+		end,
 	},
 }

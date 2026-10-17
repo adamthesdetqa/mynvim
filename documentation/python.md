@@ -1,6 +1,6 @@
 # Python Development Guide
 
-This configuration provides a complete Python and Jupyter/Quarto workflow powered by `pyright`, `ruff`, `conform.nvim`, `venv-selector.nvim`, `nvim-dap` (`debugpy`), `neotest` (`pytest`), and `molten-nvim` / `quarto-nvim` / `jupytext.nvim`.
+This configuration provides a complete Python and Jupyter notebook workflow powered by `pyright`, `ruff`, `conform.nvim`, `venv-selector.nvim`, `nvim-dap` (`debugpy`), `neotest` (`pytest`), and [`jupynvim`](https://github.com/sheng-tse/jupynvim).
 
 ---
 
@@ -8,7 +8,7 @@ This configuration provides a complete Python and Jupyter/Quarto workflow powere
 
 | Keybinding | Mode | Action | Description |
 |------------|------|--------|-------------|
-| `<leader>vs` | Normal | **Select Python Venv** | Opens Telescope picker (`venv-selector.nvim`) to choose a virtual environment. Automatically syncs `pyright`, `dap-python`, `neotest-python`, and `molten-nvim`. |
+| `<leader>vs` | Normal | **Select Python Venv** | Opens Telescope picker (`venv-selector.nvim`) to choose a virtual environment. Automatically syncs `pyright`, `dap-python`, `neotest-python`, and `jupynvim`. |
 | `<leader>vc` | Normal | **Restore Cached Venv** | Re-activates the previously cached virtual environment for the current project. |
 | `<leader>rr` | Normal | **Run Current File** | Runs the current file in an interactive floating terminal (`snacks.nvim`) using the active Python virtual environment (also works for JS, TS, Go, Lua, and Shell scripts). |
 
@@ -71,40 +71,63 @@ All test and coverage keybindings live under the `<leader>l` (`+Test & Coverage`
 
 ---
 
-## 5. Jupyter & Quarto Notebooks (`molten-nvim` + `quarto-nvim`)
+## 5. Jupyter Notebooks (`jupynvim`)
 
-`.ipynb` files are automatically converted in-memory to Quarto `.qmd` buffers via `jupytext.nvim` with per-chunk Python LSP via `otter.nvim`. All notebook keybindings use the `<leader>j` (`+jupyter`) prefix.
+Open any `.ipynb` file directly (`nvim notebook.ipynb`). `jupynvim` renders a VSCode-style cell view backed by a native Rust engine (`jupynvim-core`), auto-detects `.venv` (`auto_venv = true`) or uses the venv selected via `<leader>vs`, and renders inline plots directly in the terminal.
 
-### Kernel & Output Management (`.py` and `.ipynb` / `.qmd`)
+### Cell Command Mode vs. Edit Mode (Adapted to `j`/`k`/`l`/`;` Navigation)
+
+Notebooks open in **Cell Command Mode** (left border is blue). Press `Enter` or `i` to enter **Cell Edit Mode** (left border turns green, motions stay clamped inside the current cell), and press `Esc` in Normal mode to return to **Cell Command Mode**:
+
+| Keybinding | Mode | Action |
+|------------|------|--------|
+| `k` / `<Down>` | Command / Edit | **Next cell** (Command mode) / **Move down inside cell** (Edit mode) |
+| `l` / `<Up>` | Command / Edit | **Previous cell** (Command mode) / **Move up inside cell** (Edit mode) |
+| `Enter` / `i` / `I` / `A` / `o` / `O` | Command | **Enter Cell Edit Mode** |
+| `Esc` | Normal (Edit) | **Return to Cell Command Mode** |
+| `a` / `b` | Command | **Add cell above / below** |
+| `dd` / `u` | Command | **Delete cell** / **Undo cell delete** |
+| `yy` / `p` / `P` | Command | **Yank cell** / **Paste cell below / above** |
+| `gg` / `G` | Command / Edit | **First / Last cell** (Command) or **First / Last line of cell** (Edit) |
+| `]c` / `[c` | Normal | **Next / Previous cell** |
+| `]i` / `[i` | Normal | **Next / Previous image cell** |
+
+### Running Cells (`<leader>j`)
 
 | Keybinding | Mode | Action | Description |
 |------------|------|--------|-------------|
-| `<leader>ji` | Normal | **Init Molten Kernel** | Initializes and attaches a Jupyter kernel to the buffer (auto-runs when selecting a venv with `<leader>vs` if `ipykernel` is registered). |
-| `<leader>jr` | Normal | **Restart Kernel** | Restarts the attached Jupyter kernel. |
-| `<leader>jq` | Normal | **Stop Molten** | Deinitializes Molten for the current buffer. |
-| `<leader>jo` | Normal | **Enter Output Window** | Moves the cursor into the floating cell output window so you can scroll or copy text. |
-| `<leader>jy` | Normal | **Yank Output** | Copies the current cell's output to the system clipboard. |
-| `<leader>jh` | Normal | **Hide Output** | Hides the floating cell output window. |
-| `<leader>jd` | Normal | **Delete Cell Output** | Clears the current cell's evaluated output. |
+| `<S-CR>` | Normal, Insert | **Run Cell + Advance** | Executes the current cell and advances to the next cell (auto-starts kernel if needed). |
+| `<C-CR>` | Normal, Insert | **Run Cell (Stay)** | Executes the current cell and stays on it. |
+| `<leader>jc` | Normal | **Run Cell + Advance** | Leader alternative to `<S-CR>`. |
+| `<leader>ja` | Normal | **Run All Above** | Executes all cells above the current cell. |
+| `<leader>jb` | Normal | **Run All Below** | Executes the current cell and all cells below it. |
+| `<leader>jA` | Normal | **Run All Cells** | Executes every code cell in the notebook. |
 
-### Code Execution
+### Cell & Kernel Management (`<leader>j`)
 
-| Keybinding | Mode | Context | Action | Description |
-|------------|------|---------|--------|-------------|
-| `<leader>jc` | Normal | `.ipynb` / `.qmd` | **Run Cell** | Evaluates the current `{python}` code chunk via Quarto/Molten. |
-| `<leader>ja` | Normal | `.ipynb` / `.qmd` | **Run Cell & Above** | Evaluates all chunks up to and including the current chunk. |
-| `<leader>jA` | Normal | `.ipynb` / `.qmd` | **Run All Cells** | Evaluates all chunks in the notebook. |
-| `<leader>jl` | Normal | `.py` / `.ipynb` / `.qmd` | **Run Line** | Evaluates the current line. |
-| `<leader>jv` | Visual | `.py` / `.ipynb` / `.qmd` | **Run Visual Selection** | Evaluates the visually selected code. |
-| `<leader>je` | Normal | `.py` / `.ipynb` / `.qmd` | **Evaluate Operator** | Operator-pending evaluation (e.g., `<leader>jeaf` to evaluate a function). |
-| `]j` | Normal | `.ipynb` / `.qmd` | **Next Cell** | Jumps to the start of the next code chunk. |
-| `[j` | Normal | `.ipynb` / `.qmd` | **Previous Cell** | Jumps to the start of the previous code chunk. |
+| Keybinding | Mode | Action | Description |
+|------------|------|--------|-------------|
+| `<leader>jo` / `<leader>jO` | Normal | **Add Cell Below / Above** | Inserts a new cell below or above the current cell. |
+| `<leader>jd` | Normal | **Delete Cell** | Deletes the current cell. |
+| `<leader>jk` / `<leader>jl` | Normal | **Move Cell Down / Up** | Moves the current cell down (`k`) or up (`l`). |
+| `<leader>jm` / `<leader>jy` | Normal | **To Markdown / Code** | Converts the current cell to Markdown (`m`) or Code (`y`). |
+| `<leader>ji` | Normal | **Start Kernel** | Starts the default/venv Jupyter kernel. |
+| `<leader>jK` | Normal | **Pick Kernel** | Opens kernel selector (`.venv` + registered kernelspecs). |
+| `<leader>jr` | Normal | **Restart Kernel** | Restarts the running kernel. |
+| `<leader>jI` | Normal | **Interrupt Kernel** | Sends SIGINT to interrupt a running cell. |
+| `<leader>jq` | Normal | **Stop Kernel** | Shuts down the kernel. |
 
-> **Tip:** To enable automatic kernel attachment when switching virtual environments with `<leader>vs`, register `ipykernel` once inside that venv:
-> ```bash
-> python -m ipykernel install --user --name=<project-venv-name>
-> ```
-> For inline plot rendering via `image.nvim`, ensure ImageMagick is installed (`brew install imagemagick`).
+### Outputs & Images (`<leader>j`)
+
+| Keybinding | Mode | Action | Description |
+|------------|------|--------|-------------|
+| `<leader>jf` / `<leader>jF` | Normal | **Focus Output / Source** | Jumps cursor into the cell's output region (`jf`) or back to source (`jF`). |
+| `<leader>je` | Normal | **Expand / Collapse Output** | Toggles truncated output expansion. |
+| `<leader>jh` | Normal | **Hide / Show Output** | Collapses or restores the current cell's output. |
+| `<leader>jL` | Normal | **Limit Output Lines** | Prompts for max visible output lines for the current cell. |
+| `<leader>jx` / `<leader>jX` | Normal | **Clear Cell / All Outputs** | Clears the current cell's output (`jx`) or all outputs (`jX`). |
+| `<leader>js` / `<leader>jD` | Normal | **Save / Delete Image** | Saves or deletes the current cell's rendered plot image. |
+| `<leader>jR` | Normal | **Refresh Display** | Re-renders notebook borders and images. |
 
 ---
 
