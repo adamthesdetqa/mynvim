@@ -22,7 +22,7 @@ This configuration is modular and managed by [Lazy.nvim](https://github.com/folk
 - **Terminal**: Integrated terminal support via `snacks.nvim`.
 - **Git**: [Gitsigns](./gitsigns.md) for inline hunk status, staging, and blame.
 - **Testing**: `neotest` with support for Jest (Angular), [Vitest](./vitest.md), and [Pytest](./python.md).
-- **Python & Jupyter**: [Python Development Guide](./python.md) (`pyright`, `ruff`, `venv-selector`, `nvim-dap`, `molten-nvim` / `quarto-nvim`).
+- **Python & Jupyter**: [Python Development Guide](./python.md) and [Jupyter Notebooks Guide (`jupynvim`)](./jupyter.md).
 - **Syntax Selection**: [Treesitter Incremental Selection & Textobjects](./treesitter.md) for smart selection and deletion.
 - **UI**: `lualine` (statusline), `bufferline` (tabs), `alpha-nvim` (dashboard), and `tokyonight` colorscheme.
 

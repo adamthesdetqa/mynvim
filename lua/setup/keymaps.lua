@@ -33,8 +33,12 @@ keymap.set("n", "<M-Down>", ":m+1<CR>", { desc = "move line down" })
 -- keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- run current file across supported languages (Python, JS/TS, Go, Lua, Shell)
+local runner_term = nil
 keymap.set("n", "<leader>rr", function()
 	local ft = vim.bo.filetype
+	if vim.bo.modified and vim.bo.buftype == "" then
+		pcall(vim.cmd, "silent write")
+	end
 	local file = vim.fn.shellescape(vim.fn.expand("%:p"))
 	local cmd
 
@@ -64,7 +68,21 @@ keymap.set("n", "<leader>rr", function()
 		return
 	end
 
-	Snacks.terminal.open(cmd, { interactive = true })
+	if runner_term and runner_term.close then
+		pcall(function()
+			runner_term:close()
+		end)
+	end
+
+	runner_term = Snacks.terminal.open(cmd, {
+		auto_close = false,
+		start_insert = false,
+		auto_insert = false,
+		win = {
+			position = "bottom",
+			height = 0.3,
+		},
+	})
 end, { desc = "Run Current File" })
 
 -- clear search highlights
